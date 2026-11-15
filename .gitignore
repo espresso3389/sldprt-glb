@@ -1,0 +1,9 @@
+/build*/
+/out/
+*.glb
+*.sldprt
+*.SLDPRT
+*.sldasm
+*.SLDASM
+*.cadir.json
+__pycache__/

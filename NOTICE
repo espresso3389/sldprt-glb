@@ -1,0 +1,12 @@
+sldprt-glb
+Copyright 2026 Takashi Kawasaki
+
+This product contains code ported from cadmpeg
+(https://github.com/cadmpeg/cadmpeg, revision 5af954216af41fdc8aa7c559d69bbd724543d134),
+licensed under the Apache License, Version 2.0, together with downstream
+modifications to that code. Ported files carry a reference to their cadmpeg
+source in their header comment.
+
+It uses libopenparasolid from openswx
+(https://github.com/schwitters/openswx, revision 72291dc962bbf267fa40cd57813b273108ebac53),
+licensed under the MIT License.
