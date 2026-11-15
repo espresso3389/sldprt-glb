@@ -18,6 +18,7 @@
 #include <unordered_map>
 
 #include "errors.h"
+#include "glb_internal.h"
 #include "json_value.h"
 
 #ifdef SWGLB_HAVE_OCCT
@@ -66,20 +67,19 @@
 #endif
 
 namespace swglb {
+using glb_internal::GlbParts;
+using glb_internal::glb_parts;
 namespace {
-
-struct GlbParts {
-  JValue doc;
-  Bytes binary;
-};
 
 uint32_t le32(const Bytes& b, size_t at) {
   return static_cast<uint32_t>(b[at]) | static_cast<uint32_t>(b[at + 1]) << 8 |
          static_cast<uint32_t>(b[at + 2]) << 16 | static_cast<uint32_t>(b[at + 3]) << 24;
 }
 
+}  // namespace
+
 /// the reference writer glb_parts.
-GlbParts glb_parts(const Bytes& blob) {
+GlbParts glb_internal::glb_parts(const Bytes& blob) {
   if (blob.size() < 28 || std::memcmp(blob.data(), "glTF", 4) != 0 || le32(blob, 8) != blob.size())
     throw DecodeError("Invalid GLB");
   size_t size = le32(blob, 12);
@@ -95,6 +95,8 @@ GlbParts glb_parts(const Bytes& blob) {
   parts.binary.assign(blob.begin() + static_cast<std::ptrdiff_t>(end + 8), blob.end());
   return parts;
 }
+
+namespace {
 
 const JValue* get(const JValue& object, std::string_view key) {
   return object.is_object() ? object.find(key) : nullptr;

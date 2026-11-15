@@ -16,10 +16,12 @@
 #include <unordered_map>
 
 #include "errors.h"
+#include "glb_internal.h"
 #include "json_value.h"
 #include "regenerate.h"
 
 namespace swglb {
+using namespace glb_internal;
 namespace {
 
 constexpr size_t kMaxVertices = 4'000'000;
@@ -94,16 +96,11 @@ void python_bounds(const std::vector<P3>& points, P3* lo, P3* hi) {
 
 JValue jvec(const P3& p) { return JValue::Array{p[0], p[1], p[2]}; }
 
-struct Lookup {
-  std::unordered_map<std::string, const Face*> faces;
-  std::unordered_map<std::string, const Body*> bodies;
-  /// Tessellation id -> bound appearance colour (nullopt: bound appearance
-  /// without base colour).
-  std::unordered_map<std::string, std::optional<std::array<double, 4>>> bound;
-};
+}  // namespace
 
 /// the reference writer table_color (returns nullopt for None).
-std::optional<std::array<double, 4>> table_color(const Tessellation& table, const Lookup& lookup) {
+std::optional<std::array<double, 4>> glb_internal::table_color(const Tessellation& table,
+                                                               const Lookup& lookup) {
   std::optional<std::array<double, 4>> color;
   if (auto it = lookup.bound.find(table.id); it != lookup.bound.end()) color = it->second;
   if (!color && table.source_object && table.source_object->color)
@@ -128,8 +125,6 @@ std::optional<std::array<double, 4>> table_color(const Tessellation& table, cons
   if (!color) return std::nullopt;
   return linear_rgba(*color);
 }
-
-}  // namespace
 
 // ---------------------------------------------------------------------------
 // the reference writer wire_edges
@@ -234,17 +229,7 @@ std::vector<P3> wire_edges(const Model& model) {
   return lines;
 }
 
-namespace {
-
-/// the reference writer reference_plane_color: (selector, srgb, resolved, source).
-struct PlaneColor {
-  JValue selector;  // int or null
-  std::array<double, 3> srgb;
-  bool resolved;
-  const char* source;
-};
-
-PlaneColor reference_plane_color(const ReferencePlane& plane) {
+PlaneColor glb_internal::reference_plane_color(const ReferencePlane& plane) {
   if (plane.custom) {
     if (plane.custom_rgb) {
       const auto& rgb = *plane.custom_rgb;
@@ -261,6 +246,8 @@ PlaneColor reference_plane_color(const ReferencePlane& plane) {
   if (index >= 0 && index <= 0xffffffffLL) return {index, {0.0, 0.0, 0.0}, false, "indexed"};
   return {index, {0.8, 0.8, 0.8}, false, "indexed"};
 }
+
+namespace {
 
 class GlbBuilder {
  public:
@@ -670,8 +657,8 @@ bool bounds_differ(const Bounds& a, const Bounds& b) {
   return false;
 }
 
-static std::optional<Bounds> stale_surface_bounds(const Model& model,
-                                                             const Bounds& surface) {
+std::optional<Bounds> glb_internal::stale_surface_bounds(const Model& model,
+                                                         const Bounds& surface) {
   if (model.bodies.size() != 1 || model.edges.empty()) return std::nullopt;
   if (model.surfaces.empty()) return std::nullopt;
   for (const auto& s : model.surfaces)
