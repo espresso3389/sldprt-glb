@@ -61,7 +61,11 @@ if(SWGLB_WITH_OCCT)
   target_include_directories(swglb SYSTEM PRIVATE ${OpenCASCADE_INCLUDE_DIR})
   target_link_libraries(swglb PRIVATE
     TKernel TKMath TKG2d TKG3d TKGeomBase TKBRep TKGeomAlgo TKTopAlgo
-    TKShHealing TKMesh TKLCAF TKCAF TKXCAF TKRWMesh TKDEGLTF)
+    TKShHealing TKMesh TKLCAF TKCAF TKXCAF TKRWMesh)
+  # OCCT 7.8 moved RWGltf_CafWriter into TKDEGLTF; 7.6/7.7 keep it in TKRWMesh.
+  if(TARGET TKDEGLTF)
+    target_link_libraries(swglb PRIVATE TKDEGLTF)
+  endif()
 endif()
 
 add_executable(sldprt-glb src/main.cc)

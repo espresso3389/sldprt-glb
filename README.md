@@ -15,8 +15,9 @@ C++ エンジンです。「cadmpeg（Rust）→ CADIR JSON → Python の GLB �
 
 ## ビルド
 
-必要なもの: C++23 コンパイラー（GCC 13 以降 / Clang 17 以降）、CMake 3.24 以降、zlib、
-OpenCASCADE 7.8 以降（再生成を使う場合）。Parasolid の読み取りには openswx の libopenparasolid（MIT）を
+必要なもの: C++23 コンパイラー（GCC 12 以降）、CMake 3.24 以降、zlib、
+OpenCASCADE 7.6 以降（再生成を使う場合）。GCC 12 + OpenCASCADE 7.6（Debian 12）と
+GCC 15 + OpenCASCADE 7.9 で、同じ GLB を出力することを確認しています。Parasolid の読み取りには openswx の libopenparasolid（MIT）を
 CMake の FetchContent で取得します。
 
 ```bash
